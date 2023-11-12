@@ -79,6 +79,5 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          repository-name: llamapedia/a
           folder: .output/public
           token: ${{ secrets.GITHUB_TOKEN }}
