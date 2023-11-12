@@ -1,0 +1,17 @@
+body::after {
+    content: '';
+    background: #bbb no-repeat center center fixed;
+    background-image: url('/themes/background-uraraka.png');
+    background-size: cover;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    filter: blur(1px) brightness(0.3) saturate(2) sepia(0.3);
+}
+
+.logo {
+    content: url('/themes/logo-uraraka.png');
+}
