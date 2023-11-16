@@ -15,7 +15,7 @@
         </div>
     </div>
     <div v-if="completion" class="anime-completion">
-        <select class="anime-status" v-model="completion.status">
+        <select class="anime-status" v-model="completion.status" @change="checkAnimeCompleted">
                 <option value="COMPLETED">Completed</option>
                 <option value="PLANNING">Planning</option>
                 <option value="CURRENT">Watching</option>
@@ -23,11 +23,16 @@
         </select>
         <h2 class="anime-progress">
             You have watched 
-            <input type="number" v-model="completion.progress" min="0" :max="anime.episodes" /> 
+            <input type="number" v-model="completion.progress" min="0" :max="anime.episodes" :disabled="completion.status == 'COMPLETED'" /> 
             out of {{ anime.episodes }} Episodes.
         </h2>
         <button class="anime-completion-save" @click="updateAnimeCompletion" @touchend="updateAnimeCompletion">
             Save
+        </button>
+    </div>
+    <div v-else-if="anime" class="anime-completion">
+        <button class="anime-completion-save" @click="addAnimeToList" @touchend="addAnimeToList">
+            Plan to watch
         </button>
     </div>
     <div v-if="streamingData" class="streaming-links">
@@ -45,6 +50,7 @@
 
 <script lang="ts" setup>
 import DOMPurify from 'dompurify';
+
 
 const anime = ref();
 const streamingData = ref();
@@ -65,6 +71,22 @@ watch(anime, async (newVal, oldVal) => {
         console.log(completion.value);
     }
 });
+
+function checkAnimeCompleted() {
+    switch (completion.value.status) {
+        case 'COMPLETED':
+            completion.value.progress = anime.value.episodes;
+            break;
+        case 'PLANNING':
+            completion.value.progress = 0;
+            break;
+        case 'REPEATING':
+            completion.value.progress = 0;
+            break;
+        default:
+            break;
+    }
+}
 
 async function getUserData() {
     const cookies = document.cookie.split('; ');
@@ -238,6 +260,44 @@ async function updateAnimeCompletion() {
 
     const data = await response.json();
     console.error(data);
+}
+
+async function addAnimeToList() {
+    const cookies = document.cookie.split('; ');
+    const access_token_cookie = cookies.find(cookie => cookie.startsWith('access_token'));
+    const access_token = access_token_cookie ? access_token_cookie.split('=')[1] : '';
+
+    const query = `
+    mutation ($mediaId: Int, $status: MediaListStatus, $progress: Int) {
+        SaveMediaListEntry (mediaId: $mediaId, status: $status, progress: $progress) {
+            mediaId
+            status
+            progress
+        }
+    }
+    `;
+
+    const variables = {
+        mediaId: parseInt(anime.value.id),
+        status: 'PLANNING',
+        progress: 0,
+    };
+
+    const response = await fetch('https://graphql.anilist.co', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            'Authorization': `Bearer ${access_token}`,
+        },
+        body: JSON.stringify({
+            query,
+            variables,
+        }),
+    });
+
+    const data = await response.json();
+    getAnimeCompletion();
 }
 
 async function fetchStreamingData(malId: number) {

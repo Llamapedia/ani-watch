@@ -18,7 +18,7 @@
               <img src="~/assets/svg/settings.svg" alt="">
               Settings
             </a>
-            <a href="#" class="dropdown-content">
+            <a @click="deleteAccessTokenCookie" class="dropdown-content">
               <img src="~/assets/svg/arrow-out.svg" alt="">
               Logout
             </a>
@@ -99,6 +99,12 @@ async function getUserData() {
   }
 
 }
+
+const deleteAccessTokenCookie = () => {
+  document.cookie = 'access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+  window.location.reload();
+};
+
 </script>
 
 <style lang="sass">
@@ -149,10 +155,16 @@ async function getUserData() {
           border-radius: 20px
 
           .dropdown-content
-            color: black
+            color: #000
             padding: 12px 16px
             text-decoration: none
             display: block
+            cursor: pointer
+
+          .dropdown-content:nth-child(1),
+          .dropdown-content:nth-child(2)
+            color: #ccc
+            cursor: default
           
         
         &:hover .dropdown

@@ -13,17 +13,27 @@
       <li><a href="#">Link 8</a></li>
     </ul>
     <div class="theme-selector">
-        <select v-model="theme" @change="saveTheme">
-          <option value="0">Theme 1</option>
-          <option value="1">Theme 2</option>
-          <option value="2">Theme 3</option>
-        </select>
-        <button>Manage Themes</button>
-      </div>
+      <select v-model="theme" @change="saveTheme">
+        <option v-for="(themeInfo, index) in themes" :value="index" :key="index">
+          {{ themeInfo.name }}
+        </option>
+      </select>
+      <button>Manage Themes</button>
+    </div>
   </footer>
 </template>
 
 <script lang="ts" setup>
+interface ThemeInfo {
+  id?: string;
+  name?: string;
+  series?: string;
+  description?: string;
+  nsfw?: boolean;
+}
+
+const themes = inject('themes') as Ref<Record<number, ThemeInfo>>;
+
 const theme = inject('selectedTheme') as Ref<string>;
 
 const saveTheme = () => {
