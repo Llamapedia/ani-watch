@@ -77,7 +77,7 @@ async function getUserData() {
 
 async function getAnimeData() {
     await getUserData();
-    if (!user.value) return console.warn('User not logged in (yet).');
+    if (!user.value) return console.log('User not logged in (yet).');
     const access_token = Cookies.get('access_token');
 
     const query = `
