@@ -5,6 +5,8 @@
 </template>
 
 <script lang="ts" setup>
+import Cookies from 'js-cookie';
+
 onMounted(() => {
   const router = useRouter();
   const hashParams = new URLSearchParams(window.location.hash.slice(1));
@@ -16,7 +18,13 @@ onMounted(() => {
     date.setSeconds(date.getSeconds() + expires_in);  
     const expires = `expires=${date.toUTCString()}`;
 
-    document.cookie = `access_token=${access_token}; path=/; Secure; SameSite=Lax; ${expires}`;
+    Cookies.set('access_token', access_token, {
+      expires: date,
+      path: '/',
+      secure: true,
+      sameSite: 'lax',
+    });
+
     window.location.href = '/';
   }
 });

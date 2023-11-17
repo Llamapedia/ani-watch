@@ -30,6 +30,7 @@
 </template>
 
 <script lang="ts" setup>
+import Cookies from 'js-cookie';
 
 const usericon = ref();
 
@@ -59,9 +60,7 @@ function search() {
 }
 
 async function getUserData() {
-  const cookies = document.cookie.split('; ');
-  const access_token_cookie = cookies.find(cookie => cookie.startsWith('access_token'));
-  const access_token = access_token_cookie ? access_token_cookie.split('=')[1] : '';
+  const access_token = Cookies.get('access_token');
 
   const query = `
             query {
@@ -101,7 +100,7 @@ async function getUserData() {
 }
 
 const deleteAccessTokenCookie = () => {
-  document.cookie = 'access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+  Cookies.remove('access_token');
   window.location.reload();
 };
 

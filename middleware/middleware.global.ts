@@ -1,12 +1,12 @@
+import Cookies from 'js-cookie';
+
 export default defineNuxtRouteMiddleware(async (to, from) => {
     if (process.client) {
         if (to.path === '/login') {
             return;
         }
         
-        const cookies = document.cookie.split('; ');
-        const access_token_cookie = cookies.find(cookie => cookie.startsWith('access_token'));
-        const access_token = access_token_cookie ? access_token_cookie.split('=')[1] : '';
+        const access_token = Cookies.get('access_token');
 
         if (!access_token && to.path !== '/login') {
             return navigateTo('/login');
