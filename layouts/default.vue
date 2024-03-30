@@ -1,7 +1,11 @@
 <template>
-  <PageNav />
-  <slot />
-  <PageFooter />
+  <div class="page">
+    <PageNav />
+    <div class="page-content">
+      <slot />
+    </div>
+    <PageFooter />
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -13,19 +17,23 @@ interface ThemeInfo {
   nsfw?: boolean;
 }
 
-const selectedTheme = ref<string>('0');
-provide('selectedTheme', selectedTheme);
+const selectedTheme = ref<string>("0");
+provide("selectedTheme", selectedTheme);
 
-const themeFileName = ref<string | undefined>('default');
-provide('themeFileName', themeFileName);
+const themeFileName = ref<string | undefined>("default");
+provide("themeFileName", themeFileName);
 
 watch(selectedTheme, (newVal, oldVal) => {
   if (newVal !== oldVal) {
-    themeFileName.value = themes.value[parseInt(newVal)].id;
+    const themeLocation = parseInt(newVal);
+    console.warn("themeLocation", themeLocation, themes.value[themeLocation]);
+    if (themes.value[themeLocation] !== undefined) {
+      themeFileName.value = themes.value[themeLocation].id;
+    }
   }
 });
 
-const themeDomain = ref<string>('1');
+const themeDomain = ref<string>("1");
 const themes = ref<Record<number, ThemeInfo>>({});
 
 watch(themeDomain, (newVal, oldVal) => {
@@ -34,31 +42,35 @@ watch(themeDomain, (newVal, oldVal) => {
   }
 });
 
-provide('themes', themes);
-provide('themeDomain', themeDomain);
+watch(themes, (newVal, oldVal) => {
+  if (newVal !== oldVal) {
+    selectedTheme.value = localStorage.getItem("theme") || "0";
+  }
+});
+
+provide("themes", themes);
+provide("themeDomain", themeDomain);
 
 useHead(() => ({
   link: [
     {
-      rel: 'stylesheet',
-      href: `/themes/${themeFileName.value}.css`
-    }
-  ]
+      rel: "stylesheet",
+      href: `${themeDomain.value}/themes/${themeFileName.value}.css`,
+    },
+  ],
 }));
 
-onMounted(() => {
-  selectedTheme.value = localStorage.getItem('theme') || '0';
-  themeDomain.value = localStorage.getItem('themeDomain') || '';
+onBeforeMount(() => {
+  themeDomain.value = localStorage.getItem("themeDomain") || "";
   fetchThemes();
 });
 
-const fetchThemes = async() => {
+const fetchThemes = async () => {
   fetch(`${themeDomain.value}/themes.json`)
-    .then(res => res.json())
-    .then(data => themes.value = data)
-    .catch(error => console.error(error)); // Add a catch block to handle any errors
+    .then((res) => res.json())
+    .then((data) => (themes.value = data))
+    .catch((error) => console.error(error)); // Add a catch block to handle any errors
 };
-
 </script>
 
 <style lang="sass">
@@ -67,15 +79,15 @@ const fetchThemes = async() => {
 body, html
   margin: 0
   padding: 0
-  display: flex
-  flex-direction: column
-  height: 100%
-  width: 100%
-  min-height: 100vh
   font-family: 'Kanit', sans-serif
   background: transparent
   position: relative
   overflow-x: hidden
 
+.page
+  display: flex
+  flex-direction: column
+  min-height: 100vh
+  width: 100%
+  position: relative
 </style>
-

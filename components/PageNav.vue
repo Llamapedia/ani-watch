@@ -2,24 +2,40 @@
   <nav class="navbar">
     <div class="navbar-elements">
       <nuxt-link to="/" class="logo">
-        <img alt="Logo" class="logo">
+        <img alt="Logo" class="logo" />
       </nuxt-link>
       <div class="right-side">
-        <input type="search" placeholder="Search" class="search-bar" v-model="searchContent" @keyup.enter="search">
-        <div class="account-icon">
-          <img ref="usericon" src="~/assets/svg/user-circle.svg" alt="Account" class="account-icon" width="32"
-            height="32">
-          <div v-if="signedIn" class="dropdown">
+        <input
+          type="search"
+          placeholder="Search"
+          class="search-bar"
+          v-model="searchContent"
+          @keyup.enter="search"
+        />
+        <div
+          class="account-icon-container"
+          @mouseover="dropdown = true"
+          @mouseleave="dropdown = false"
+        >
+          <img
+            ref="usericon"
+            src="~/assets/svg/user-circle.svg"
+            alt="Account"
+            class="account-icon"
+            width="32"
+            height="32"
+          />
+          <div v-if="signedIn && dropdown" class="dropdown">
             <a href="#" class="dropdown-content">
-              <img src="~/assets/svg/user.svg" alt="">
+              <img src="~/assets/svg/user.svg" alt="" />
               Profile
             </a>
             <a href="#" class="dropdown-content">
-              <img src="~/assets/svg/settings.svg" alt="">
+              <img src="~/assets/svg/settings.svg" alt="" />
               Settings
             </a>
             <a @click="deleteAccessTokenCookie" class="dropdown-content">
-              <img src="~/assets/svg/arrow-out.svg" alt="">
+              <img src="~/assets/svg/arrow-out.svg" alt="" />
               Logout
             </a>
           </div>
@@ -30,25 +46,27 @@
 </template>
 
 <script lang="ts" setup>
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 
 const usericon = ref();
 
 const userdata = ref({});
 const signedIn = ref(false);
-const searchContent = ref('');
+const searchContent = ref("");
+
+const dropdown = ref(false);
 
 const router = useRouter();
 
-const themeFileName = inject('themeFileName');
+const themeFileName = inject("themeFileName");
 
 useHead(() => ({
   link: [
     {
-      rel: 'stylesheet',
-      href: `/themes/${themeFileName}.css`
-    }
-  ]
+      rel: "stylesheet",
+      href: `/themes/${themeFileName}.css`,
+    },
+  ],
 }));
 
 onMounted(() => {
@@ -60,7 +78,7 @@ function search() {
 }
 
 async function getUserData() {
-  const access_token = Cookies.get('access_token');
+  const access_token = Cookies.get("access_token");
 
   const query = `
             query {
@@ -73,15 +91,14 @@ async function getUserData() {
             }
         `;
 
-  const variables = {
-  };
+  const variables = {};
 
-  const response = await fetch('https://graphql.anilist.co', {
-    method: 'POST',
+  const response = await fetch("https://graphql.anilist.co", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      'Authorization': `Bearer ${access_token}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${access_token}`,
     },
     body: JSON.stringify({
       query,
@@ -96,27 +113,25 @@ async function getUserData() {
     usericon.value.src = data.data.Viewer.avatar.large;
     signedIn.value = true;
   }
-
 }
 
 const deleteAccessTokenCookie = () => {
-  Cookies.remove('access_token');
+  Cookies.remove("access_token");
   window.location.reload();
 };
-
 </script>
 
 <style lang="sass">
-.navbar 
+.navbar
   height: 50px
   display: flex
   justify-content: space-between
   align-items: center
   background-color: #ddddddaa
   backdrop-filter: blur(10px)
-  
 
-  .navbar-elements 
+
+  .navbar-elements
     height: 50px
     width: 100%
     padding: 0 10px
@@ -126,10 +141,10 @@ const deleteAccessTokenCookie = () => {
     max-width: 800px
     margin: auto
 
-    .logo 
+    .logo
       height: 100%
 
-    .right-side 
+    .right-side
       display: flex
       align-items: center
 
@@ -140,14 +155,21 @@ const deleteAccessTokenCookie = () => {
         border: 2px solid #afafaf
         padding: 3px 5px
 
-      .account-icon 
-        height: 32px
-        width: 32px
-        border-radius: 50%
+      .account-icon-container
+        display: flex
+        height: 50px
+        align-items: center
+        position: relative
+
+        .account-icon
+          height: 32px
+          width: 32px
+          border-radius: 50%
 
         .dropdown
-          display: none
-          transform: translateX(-80%)
+          position: absolute
+          top: 50px
+          left: -120px
           background-color: #f9f9f9
           min-width: 160px
           box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2)
@@ -157,16 +179,22 @@ const deleteAccessTokenCookie = () => {
             color: #000
             padding: 12px 16px
             text-decoration: none
-            display: block
+            display: flex
+            align-items: center
+            gap: 10px
             cursor: pointer
 
-          .dropdown-content:nth-child(1),
-          .dropdown-content:nth-child(2)
-            color: #ccc
-            cursor: default
-          
-        
-        &:hover .dropdown
-          display: block
+            &:hover
+              background-color: #ddd
 
+            &:first-child
+              border-radius: 20px 20px 0 0
+
+            &:last-child
+              border-radius: 0 0 20px 20px
+
+            &:nth-child(1),
+            &:nth-child(2)
+              color: #ccc
+              cursor: default
 </style>

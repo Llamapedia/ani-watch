@@ -11,13 +11,13 @@ body::after {
     width: 100%;
     height: 100%;
     z-index: -1;
-    filter: blur(1px) brightness(0.9) grayscale(0.1);
+    /* filter: blur(1px) brightness(0.9) grayscale(0.1); */
 }
 
 @media screen and (max-width: 1000px) {
     body::after {
         background-image: url('/themes/background-ashido-mobile.png');
-        filter: blur(1px) brightness(0.8) grayscale(0.1) saturate(2) sepia(0.3);
+        /* filter: blur(1px) brightness(0.8) grayscale(0.1) saturate(2) sepia(0.3); */
     }
 }
 

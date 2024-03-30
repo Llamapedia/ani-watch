@@ -8,6 +8,7 @@
         padding: 2px 5px
         border-radius: 5px
         width: fit-content
+        margin-left: 20px
 
     .search-item-amount
         color: #fff
@@ -16,6 +17,7 @@
         padding: 2px 5px
         border-radius: 5px
         width: fit-content
+        margin-left: 20px
 
     .card
         color: #fff
@@ -28,6 +30,9 @@
         flex-direction: row
         box-sizing: border-box
 
+        @media screen and (max-width: 768px)
+            flex-direction: column
+
         .card-img
             flex: 0 0 40%
             max-width: 40%
@@ -37,12 +42,25 @@
                 border-radius: 20px
                 width: 100%
 
+            @media screen and (max-width: 768px)
+                margin: 0 auto
+                max-width: 100%
+                margin-bottom: 20px
+
         .card-body
             flex: 0 0 60%
             max-width: 60%
             padding: 0 20px
             box-sizing: border-box
 
+            @media screen and (max-width: 768px)
+                margin: 0 auto
+                max-width: 100%
+
             .card-title
                 a
                     color: #fff
+
+            .card-text
+                @media screen and (max-width: 768px)
+                    display: none

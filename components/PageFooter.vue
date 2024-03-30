@@ -1,25 +1,21 @@
 <template>
   <footer class="footer">
-    <ul>
-      <li><a href="#">Link 1</a></li>
-      <li><a href="#">Link 2</a></li>
-      <li><a href="#">Link 3</a></li>
-      <li><a href="#">Link 4</a></li>
-    </ul>
-    <ul>
-      <li><a href="#">Link 5</a></li>
-      <li><a href="#">Link 6</a></li>
-      <li><a href="#">Link 7</a></li>
-      <li><a href="#">Link 8</a></li>
-    </ul>
     <div class="theme-selector">
       <select v-model="theme" @change="saveTheme">
-        <option v-for="(themeInfo, index) in themes" :value="index" :key="index">
+        <option
+          v-for="(themeInfo, index) in themes"
+          :value="index"
+          :key="index"
+        >
           {{ themeInfo.name }}
         </option>
       </select>
-      <button>Manage Themes</button>
+      <button @click="navigateTo('/themes')">Manage Themes</button>
     </div>
+    <p>
+      We are not responsible for the content on this website. All rights belong
+      to anilist and malsync.
+    </p>
   </footer>
 </template>
 
@@ -32,43 +28,62 @@ interface ThemeInfo {
   nsfw?: boolean;
 }
 
-const themes = inject('themes') as Ref<Record<number, ThemeInfo>>;
+const themes = inject("themes") as Ref<Record<number, ThemeInfo>>;
 
-const theme = inject('selectedTheme') as Ref<string>;
+const theme = inject("selectedTheme") as Ref<string>;
 
 const saveTheme = () => {
-  localStorage.setItem('theme', theme.value);
-}
+  localStorage.setItem("theme", theme.value);
+};
 </script>
 
 <style lang="sass">
 .footer
+  position: relative
   margin-top: auto
   width: 100%
   display: flex
-  justify-content: space-around
+  flex-shrink: 0
+  flex-direction: column
+  justify-content: center
+  align-items: center
   height: 200px
   background: #ddddddaa
   backdrop-filter: blur(10px)
 
-ul
-  list-style-type: none
-
-a
-  text-decoration: none
-  color: black
-
 .theme-selector
   display: flex
-  flex-direction: column
+  flex-direction: row
   gap: 20px
   align-items: center
-  //justify-content: center
+  justify-content: center
 
-ul
-  list-style-type: none
+  select
+    border: 3px solid #fff
+    border-radius: 10px
+    width: 300px
+    font: inherit
+    background: #0008
+    color: #fff
+    padding: 5px 10px
+    cursor: pointer
+    transition: background 0.3s ease-in-out
 
-a
-  text-decoration: none
-  color: black
+    &:hover
+      background: #fff
+      color: #000
+
+  button
+    border: 3px solid #fff
+    border-radius: 10px
+    font: inherit
+    background: #0008
+    color: #fff
+    padding: 5px 10px
+    cursor: pointer
+    transition: background 0.3s ease-in-out
+
+    &:hover
+      background: #fff
+      color: #000
 </style>

@@ -1,39 +1,51 @@
 <template>
-    <div v-if="!user">
-        <h1>Welcome on wwwwwww</h1>
-        <h2>To use wwww in any capacity you must sign in using your anilist.co account.</h2>
-        <nuxt-link to="/login">Go to login page.</nuxt-link>
-    </div>
-    <div v-else class="index-content">
-        <h1>Welcome back, {{ user.name }}</h1>
-        <div v-if="lists">
-            <div v-for="list in lists" :key="list.name" class="user-list">
-                <h2 class="user-list-title">{{ list.name }}</h2>
-                <div v-for="entry in list.entries" :key="entry.media.id" class="user-list-entry">
-                    <nuxt-link :to="`/anime/${entry.media.idMal}`">
-                        <div class="user-list-entry-cover">
-                            <img :src="entry.media.coverImage.large" alt="Cover Image" class="user-list-entry-cover-image">
-                        </div>
-                    
-                        <div class="user-list-entry-info">
-                            <h4>{{ entry.media.title.english }}</h4>
-                            <h5>
-                                {{ entry.progress }}/{{ entry.media.episodes }} Episodes watched.
-                                <span v-if="entry.score > 0">{{ entry.score }} / 10</span>
-                            </h5>
-                        </div>
-                    </nuxt-link>
-                </div>
+  <div v-if="!user" class="index-content">
+    <h1 class="index-welcome">Welcome on anime.vg</h1>
+    <h2 class="index-login-notification">
+      To use anime.vg in any capacity you must sign in using your anilist.co
+      account.
+    </h2>
+    <nuxt-link to="/login">Go to login page.</nuxt-link>
+  </div>
+  <div v-else class="index-content">
+    <h1>Welcome back, {{ user.name }}.</h1>
+    <div v-if="lists">
+      <div v-for="list in lists" :key="list.name" class="user-list">
+        <h2 class="user-list-title">{{ list.name }}</h2>
+        <div
+          v-for="entry in list.entries"
+          :key="entry.media.id"
+          class="user-list-entry"
+        >
+          <nuxt-link :to="`/anime/${entry.media.idMal}`">
+            <div class="user-list-entry-cover">
+              <img
+                :src="entry.media.coverImage.large"
+                alt="Cover Image"
+                class="user-list-entry-cover-image"
+              />
             </div>
+
+            <div class="user-list-entry-info">
+              <h4>{{ entry.media.title.english }}</h4>
+              <h5>
+                {{ entry.progress }}/{{ entry.media.episodes }} Episodes
+                watched.
+                <span v-if="entry.score > 0">{{ entry.score }} / 10</span>
+              </h5>
+            </div>
+          </nuxt-link>
         </div>
-        <div v-else>
-            <h2>We're sorry, but we couldn't get your lists.</h2>
-        </div>
+      </div>
     </div>
+    <div v-else>
+      <h2>We're sorry, but we couldn't get your lists.</h2>
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 
 const user = ref();
 const lists = ref();
@@ -41,9 +53,9 @@ const lists = ref();
 getAnimeData();
 
 async function getUserData() {
-    const access_token = Cookies.get('access_token');
+  const access_token = Cookies.get("access_token");
 
-    const query = `
+  const query = `
             query {
                 Viewer {
                     id
@@ -52,35 +64,34 @@ async function getUserData() {
             }
         `;
 
-    const variables = {
-    };
+  const variables = {};
 
-    const response = await fetch('https://graphql.anilist.co', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            'Authorization': `Bearer ${access_token}`,
-        },
-        body: JSON.stringify({
-            query,
-            variables,
-        }),
-    });
+  const response = await fetch("https://graphql.anilist.co", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${access_token}`,
+    },
+    body: JSON.stringify({
+      query,
+      variables,
+    }),
+  });
 
-    if (response.status === 200) {
-        const data = await response.json();
-        console.log(data);
-        user.value = data.data.Viewer;
-    }
+  if (response.status === 200) {
+    const data = await response.json();
+    console.log(data);
+    user.value = data.data.Viewer;
+  }
 }
 
 async function getAnimeData() {
-    await getUserData();
-    if (!user.value) return console.log('User not logged in (yet).');
-    const access_token = Cookies.get('access_token');
+  await getUserData();
+  if (!user.value) return console.log("User not logged in (yet).");
+  const access_token = Cookies.get("access_token");
 
-    const query = `
+  const query = `
         query ($userId: Int, $type: MediaType) {
             MediaListCollection(userId: $userId, type: $type) {
                 lists {
@@ -114,34 +125,39 @@ async function getAnimeData() {
         }
     `;
 
-    const variables = {
-        userId: user.value.id,
-        type: 'ANIME',
-    };
+  const variables = {
+    userId: user.value.id,
+    type: "ANIME",
+  };
 
-    const response = await fetch('https://graphql.anilist.co', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            'Authorization': `Bearer ${access_token}`,
-        },
-        body: JSON.stringify({
-            query,
-            variables,
-        }),
-    });
+  const response = await fetch("https://graphql.anilist.co", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${access_token}`,
+    },
+    body: JSON.stringify({
+      query,
+      variables,
+    }),
+  });
 
-    const data = await response.json();
-    console.log(data);
-    lists.value = data.data.MediaListCollection.lists;
-    console.warn(lists.value);
+  const data = await response.json();
+  console.log(data);
+  lists.value = data.data.MediaListCollection.lists;
+  const order = ["Watching", "Rewatching", "Planning", "Completed"];
+  lists.value.sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name));
+
+  console.warn(lists.value);
 }
 </script>
 
 <style lang="sass" scoped>
 *
     color: #fff
+    -webkit-font-smoothing: antialiased
+    -moz-osx-font-smoothing: grayscale
 
 .index-content
     margin: 10px auto
@@ -149,7 +165,11 @@ async function getAnimeData() {
 
     @media screen and (max-width: 800px)
         margin: 10px 20px
-    
+
+.index-welcome
+    font-size: 4em
+    margin: 0
+
 
 .user-list
     display: grid
