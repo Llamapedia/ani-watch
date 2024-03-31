@@ -8,9 +8,39 @@
     <nuxt-link to="/login">Go to login page.</nuxt-link>
   </div>
   <div v-else class="index-content">
-    <h1>Welcome back, {{ user.name }}.</h1>
+    <h1 class="index-welcome">Welcome back, {{ user.name }}.</h1>
     <div v-if="lists">
-      <div v-for="list in lists" :key="list.name" class="user-list">
+      <div class="user-list-selector">
+        <h2>Select a list to view:</h2>
+        <div class="user-list-selector-items">
+          <a
+            v-for="list in lists"
+            :key="list.name"
+            @click="scrollTo(list.name)"
+          >
+            {{ list.name }}
+          </a>
+        </div>
+        <div class="user-list-compact-switch">
+          <label for="compact-view">Compact view</label>
+          <input
+            type="checkbox"
+            name="compact-view"
+            id="compact-view"
+            v-model="compactView"
+          />
+        </div>
+      </div>
+      <div class="user-list-top">
+        <button @click="scrollToTop">⬆️</button>
+      </div>
+      <div
+        v-for="list in lists"
+        :key="list.name"
+        class="user-list"
+        :class="compactView ? 'user-list-compact' : ''"
+        :id="list.name"
+      >
         <h2 class="user-list-title">{{ list.name }}</h2>
         <div
           v-for="entry in list.entries"
@@ -50,7 +80,12 @@ import Cookies from "js-cookie";
 const user = ref();
 const lists = ref();
 
-getAnimeData();
+const compactView = ref(false);
+
+onMounted(() => {
+  compactView.value = window.innerWidth < 600;
+  getAnimeData();
+});
 
 async function getUserData() {
   const access_token = Cookies.get("access_token");
@@ -151,6 +186,17 @@ async function getAnimeData() {
 
   console.warn(lists.value);
 }
+
+const scrollTo = (id: string) => {
+  const element = document.getElementById(id);
+  if (element) {
+    element.scrollIntoView({ behavior: "smooth" });
+  }
+};
+
+const scrollToTop = () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
 </script>
 
 <style lang="sass" scoped>
@@ -162,22 +208,97 @@ async function getAnimeData() {
 .index-content
     margin: 10px auto
     max-width: 800px
+    scroll-behavior: smooth
 
     @media screen and (max-width: 800px)
         margin: 10px 20px
 
 .index-welcome
     font-size: 4em
-    margin: 0
+    line-height: 1.1
+    margin: 30px 0
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, 0 0 10px black
 
+    @media screen and (max-width: 800px)
+        font-size: 3em
+
+.user-list-selector
+    margin: 10px 0
+    padding: 10px
+    background: #0008
+    border-radius: 20px
+
+    .user-list-selector-items
+      display: flex
+      gap: 10px
+      flex-wrap: wrap
+
+    .user-list-compact-switch
+      margin-top: 10px
+      margin-left: 4px
+      display: flex
+      align-items: center
+      gap: 10px
+      user-select: none
+
+      label, input
+        cursor: pointer
+
+    h2
+        margin: 4px
+
+    a
+        font-size: 1.5em
+        padding: 5px 10px
+        border-radius: 10px
+        background: #0008
+        color: #fff
+        border: 3px solid #fff
+        cursor: pointer
+        transition: background 0.3s ease-in-out
+
+        &:hover
+            background: #fff
+            color: #000
+
+.user-list-top
+    position: fixed
+    bottom: 10px
+    right: 10px
+    width: fit-content
+    z-index: 10
+
+    button
+        font-size: 2em
+        padding: 5px 10px
+        border-radius: 10px
+        background: #0008
+        color: #fff
+        border: 3px solid #fff
+        cursor: pointer
+        transition: background 0.3s ease-in-out
+
+        &:hover
+            background: #fff
+            color: #000
+
+.user-list-compact
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important
 
 .user-list
     display: grid
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr))
     grid-gap: 10px
+    margin-bottom: 20px
 
     .user-list-title
         grid-column: 1 / -1
+        margin: 0
+        font-size: 2em
+        background: #0008
+        width: fit-content
+        padding: 0 5px
+        border-radius: 10px
 
     .user-list-entry
         grid-column: span 1

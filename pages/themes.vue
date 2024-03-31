@@ -24,6 +24,8 @@
         id="preview"
         v-model="previewThemes"
       />
+      <label for="nsfw">Allow NSFW themes</label>
+      <input type="checkbox" name="nsfw" id="nsfw" v-model="nsfwThemes" />
     </div>
     <div
       v-if="themes"
@@ -32,7 +34,18 @@
       class="theme-item"
     >
       <div class="theme">
-        <div v-if="previewThemes" class="theme-preview-images">
+        <div
+          v-if="previewThemes"
+          class="theme-preview-images"
+          :class="!nsfwThemes && theme?.nsfw ? 'theme-preview-blur' : ''"
+        >
+          <div v-if="!nsfwThemes && theme?.nsfw" class="theme-nsfw-tag">
+            <p>🥵</p>
+            <p>
+              This theme contains NSFW content. Adjust your filter settings
+              above.
+            </p>
+          </div>
           <img
             :src="`${themeDomain}/themes/background-${theme.id}.png`"
             alt=""
@@ -47,7 +60,12 @@
         <p v-if="theme?.nsfw" class="theme-nsfw">🔞</p>
         <div class="theme-title-bar">
           <h2>{{ theme?.name }}</h2>
-          <button @click="setTheme(index)">Use this theme</button>
+          <button
+            @click="setTheme(index)"
+            :disabled="!nsfwThemes && theme?.nsfw"
+          >
+            Use this theme
+          </button>
         </div>
         <h3 v-if="theme?.series">{{ theme?.series }}</h3>
         <p>{{ theme?.description }}</p>
@@ -74,6 +92,11 @@ const themeDomain = inject("themeDomain") as Ref<string>;
 const selectedTheme = inject("selectedTheme") as Ref<string>;
 
 const previewThemes = ref(true);
+const nsfwThemes = ref(false);
+
+watch(nsfwThemes, (newVal, oldVal) => {
+  localStorage.setItem("nsfwThemes", newVal.toString());
+});
 
 const setThemeDomain = () => {
   localStorage.setItem("themeDomain", themeDomain.value);
@@ -85,6 +108,10 @@ const setTheme = (themeId: number) => {
   selectedTheme.value = themeId.toString();
   localStorage.setItem("theme", themeId.toString());
 };
+
+onBeforeMount(() => {
+  nsfwThemes.value = localStorage.getItem("nsfwThemes") === "true";
+});
 </script>
 
 <style lang="sass" scoped>
@@ -153,8 +180,11 @@ const setTheme = (themeId: number) => {
             &:hover
                 cursor: pointer
 
-        input:hover
+        input
             cursor: pointer
+
+        #preview
+            margin-right: 10px
 
     .theme-item
         padding: 10px
@@ -168,27 +198,64 @@ const setTheme = (themeId: number) => {
                 position: relative
                 min-height: 80px
 
-            .theme-preview-bg
-                width: 100%
+                .theme-preview-bg
+                    width: 100%
+                    border-radius: 10px
+
+                .theme-preview-logo
+                    width: 20%
+                    position: absolute
+                    top: 0
+                    left: 0
+
+                .theme-nsfw-tag
+                    position: absolute
+                    top: 50%
+                    left: 50%
+                    transform: translate(-50%, -50%)
+                    z-index: 10
+
+                    p
+                        margin: 0
+                        text-align: center
+
+                        &:first-child
+                            font-size: 4em
+
+                        &:last-child
+                            font-size: 1em
+                            text-shadow: 0 0 10px #000
+
+            .theme-preview-blur
+                position: relative
+                overflow: hidden
                 border-radius: 10px
 
-            .theme-preview-logo
-                width: 20%
-                position: absolute
-                top: 0
-                left: 0
+                img
+                    filter: blur(20px)
+
 
             .theme-nsfw
                 font-size: 1.5em
                 position: absolute
+                top: 10px
                 right: 10px
                 user-select: none
 
             .theme-title-bar
-                display: flex
-                flex-direction: row
-                gap: 10px
-                align-items: center
+                margin: 0 3px
+                max-width: 100%
+                display: grid
+                grid-template-columns: 60% 40%
+                align-items: start
+
+                h2
+                    margin: 0
+                    overflow: hidden
+                    text-overflow: ellipsis
+                    display: -webkit-box
+                    -webkit-line-clamp: 2
+                    -webkit-box-orient: vertical
 
                 button
                     border: 3px solid #fff
@@ -203,6 +270,14 @@ const setTheme = (themeId: number) => {
                     &:hover
                         background: #fff
                         color: #000
+
+                    &:disabled
+                        border-color: #888
+                        color: #888
+
+                        &:hover
+                            background: #0008
+                            cursor: not-allowed
 
             h2
                 margin: 4px
