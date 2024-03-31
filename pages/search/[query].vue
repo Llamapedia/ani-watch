@@ -17,32 +17,61 @@
           <div class="col-4" v-for="result in searchResults" :key="result.id">
             <div class="card mb-3">
               <div class="card-img">
-                <img :src="result.coverImage.large" class="card-img-top" alt="...">
+                <img
+                  :src="result.coverImage.large"
+                  class="card-img-top"
+                  alt="..."
+                  @click="navigateTo(`/anime/${result.idMal}`)"
+                />
               </div>
               <div class="card-body">
-                <h3 class="card-title"><nuxt-link :to="`/anime/${result.idMal}`" target="" rel="noopener noreferrer">{{ result.title.english }}</nuxt-link></h3>
+                <h3 class="card-title">
+                  <nuxt-link
+                    :to="`/anime/${result.idMal}`"
+                    target=""
+                    rel="noopener noreferrer"
+                    >{{ result.title.english }}</nuxt-link
+                  >
+                </h3>
                 <div class="card-info">
                   <span class="card-type">{{ result.type }}</span>
-                  <span class="card-episodes" v-if="result.episodes"> | {{ result.episodes }} Episodes</span>
+                  <span class="card-episodes" v-if="result.episodes">
+                    | {{ result.episodes }} Episodes</span
+                  >
                 </div>
-                <p class="card-text" v-html="sanitizeHTML(result.description)"></p>
+                <p
+                  class="card-text"
+                  v-html="sanitizeHTML(result.description)"
+                ></p>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="col-12">
-        <button class="btn btn-primary" @click="prevPage" :disabled="currentPage <= 1">Previous</button>
-        <button class="btn btn-primary" @click="nextPage" :disabled="currentPage >= totalPages">Next</button>
+      <div class="search-pagination">
+        <button
+          class="search-pagination-button"
+          @click="prevPage"
+          :disabled="currentPage <= 1"
+        >
+          Previous
+        </button>
+        <button
+          class="search-pagination-button"
+          @click="nextPage"
+          :disabled="currentPage >= totalPages"
+        >
+          Next
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import '~/assets/search.sass';
+import "~/assets/search.sass";
 
-import DOMPurify from 'dompurify';
+import DOMPurify from "dompurify";
 
 const searchResults = ref([]);
 const currentPage = ref(1);
@@ -54,9 +83,9 @@ const router = useRouter();
 
 const searchTerm = useRoute().params.query.toString();
 
-onMounted(async() => {
+onMounted(async () => {
   if (!route.query.page) {
-    await router.push({ query: { ...route.query, page: 1 }});
+    await router.push({ query: { ...route.query, page: 1 } });
   }
   currentPage.value = Number(route.query.page) || 1;
   await searchAniList(searchTerm, currentPage.value, perPage.value);
@@ -78,12 +107,16 @@ watch(perPage, async (newVal, oldVal) => {
 
 watch(currentPage, async (newVal, oldVal) => {
   if (newVal !== oldVal) {
-    await router.push({ query: { ...route.query, page: newVal }});
+    await router.push({ query: { ...route.query, page: newVal } });
     window.scrollTo(0, 0);
   }
 });
 
-async function searchAniList(searchTerm: string, page: number, perPage: number) {
+async function searchAniList(
+  searchTerm: string,
+  page: number,
+  perPage: number
+) {
   const query = `
   query ($id: Int, $page: Int, $perPage: Int, $search: String) {
     Page (page: $page, perPage: $perPage) {
@@ -122,11 +155,11 @@ async function searchAniList(searchTerm: string, page: number, perPage: number) 
     perPage: perPage,
   };
 
-  const response = await fetch('https://graphql.anilist.co', {
-    method: 'POST',
+  const response = await fetch("https://graphql.anilist.co", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
+      "Content-Type": "application/json",
+      Accept: "application/json",
     },
     body: JSON.stringify({
       query,
@@ -154,8 +187,7 @@ function prevPage() {
   }
 }
 
-
-async function aniListToMal(anilistId: number, type: 'anime' | 'manga') {
+async function aniListToMal(anilistId: number, type: "anime" | "manga") {
   const query = `
   query ($id: Int, $type: MediaType) {
     Media (id: $id, type: $type) {
@@ -170,11 +202,11 @@ async function aniListToMal(anilistId: number, type: 'anime' | 'manga') {
     type: type.toUpperCase(),
   };
 
-  const response = await fetch('https://graphql.anilist.co', {
-    method: 'POST',
+  const response = await fetch("https://graphql.anilist.co", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
+      "Content-Type": "application/json",
+      Accept: "application/json",
     },
     body: JSON.stringify({
       query,

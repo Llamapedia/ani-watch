@@ -52,16 +52,18 @@ const saveTheme = () => {
   backdrop-filter: blur(10px)
 
 .theme-selector
-  display: flex
-  flex-direction: row
+  display: grid
+  grid-template-columns: 70% 30%
   gap: 20px
   align-items: center
   justify-content: center
+  width: calc( 100% - 40px )
+  max-width: 400px
 
   select
     border: 3px solid #fff
     border-radius: 10px
-    width: 300px
+    width: 100%
     font: inherit
     background: #0008
     color: #fff
@@ -75,6 +77,7 @@ const saveTheme = () => {
 
   button
     border: 3px solid #fff
+    width: 100%
     border-radius: 10px
     font: inherit
     background: #0008

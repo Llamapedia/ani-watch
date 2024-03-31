@@ -218,6 +218,7 @@ const scrollToTop = () => {
     line-height: 1.1
     margin: 30px 0
     text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, 0 0 10px black
+    user-select: none
 
     @media screen and (max-width: 800px)
         font-size: 3em
