@@ -15,11 +15,16 @@
     "nuxt": "^3.8.1",
     "sass": "^1.69.5",
     "vue": "^3.3.8",
-    "vue-router": "^4.2.5"
+    "vue-router": "^4.2.5",
+    "@types/bun": "latest"
   },
   "dependencies": {
     "@nuxt/ui": "^2.14.1",
     "dompurify": "^3.0.6",
     "js-cookie": "^3.0.5"
+  },
+  "module": "index.ts",
+  "peerDependencies": {
+    "typescript": "^5.0.0"
   }
 }

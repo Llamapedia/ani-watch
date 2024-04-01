@@ -1,8 +1,8 @@
 <template>
   <div v-if="!user" class="index-content">
-    <h1 class="index-welcome">Welcome on anime.vg</h1>
+    <h1 class="index-welcome">Welcome on AN.AL.eu.org</h1>
     <h2 class="index-login-notification">
-      To use anime.vg in any capacity you must sign in using your anilist.co
+      To use AN.AL.eu.org in any capacity you must sign in using your anilist.co
       account.
     </h2>
     <nuxt-link to="/login">Go to login page.</nuxt-link>
