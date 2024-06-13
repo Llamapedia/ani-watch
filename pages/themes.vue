@@ -1,6 +1,11 @@
 <template>
   <div class="theme-settings">
-    <h1>Theme Settings</h1>
+    <p class="theme-headline">Theme Settings</p>
+    <p class="theme-explanation">
+      Here you can change the theme of the website. You can choose from a list
+      of themes available on the server or use a custom theme by providing a
+      domain.
+    </p>
     <div class="theme-domain-edit">
       <h2>Edit currently used domain here:</h2>
       <input
@@ -47,21 +52,21 @@
             </p>
           </div>
           <img
-            :src="`${themeDomain}/themes/background-${theme.id}.png`"
+            :src="`${themeDomain}/res/background/${theme.id}.png`"
             alt=""
             class="theme-preview-bg"
           />
           <img
-            :src="`${themeDomain}/themes/logo-${theme.id}.png`"
+            :src="`${themeDomain}/res/logo/${theme.id}.png`"
             alt=""
             class="theme-preview-logo"
           />
         </div>
         <p v-if="theme?.nsfw" class="theme-nsfw">🔞</p>
         <div class="theme-title-bar">
-          <h2>{{ theme?.name }}</h2>
+          <p class="theme-title">{{ theme?.name }}</p>
           <button
-            @click="setTheme(index)"
+            @click="setTheme(theme.id)"
             :disabled="!nsfwThemes && theme?.nsfw"
           >
             Use this theme
@@ -82,6 +87,8 @@ interface ThemeInfo {
   name?: string;
   series?: string;
   description?: string;
+  logo?: string;
+  viginette?: string;
   nsfw?: boolean;
 }
 
@@ -89,7 +96,7 @@ const themes = inject("themes") as Ref<Record<number, ThemeInfo>>;
 
 const themeDomain = inject("themeDomain") as Ref<string>;
 
-const selectedTheme = inject("selectedTheme") as Ref<string>;
+const selectedTheme = inject("selectedTheme") as Ref<ThemeInfo>;
 
 const previewThemes = ref(true);
 const nsfwThemes = ref(false);
@@ -103,10 +110,13 @@ const setThemeDomain = () => {
   window.location.reload();
 };
 
-const setTheme = (themeId: number) => {
-  console.log(themeId);
-  selectedTheme.value = themeId.toString();
-  localStorage.setItem("theme", themeId.toString());
+const setTheme = (themeId: String) => {
+  for (const theme in themes.value) {
+    if (themes.value[theme].id === themeId) {
+      selectedTheme.value = themes.value[theme];
+    }
+  }
+  localStorage.setItem("theme", selectedTheme.value.id);
 };
 
 onBeforeMount(() => {
@@ -120,6 +130,21 @@ onBeforeMount(() => {
     margin: 10px auto
     max-width: 800px
     color: #fff
+
+    .theme-explanation
+        font-family: 'DharmaGothicE-ExBold', sans-serif
+        font-size: 1.5rem
+        text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, 0 3px black
+        margin: 0
+        margin-bottom: 10px
+
+    .theme-headline
+        line-height: 0.9
+        font-family: 'DharmaGothicC-HeavyItalic', sans-serif
+        font-size: 10rem
+        text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, 0 3px black
+        margin: 0
+        width: fit-content
 
     .theme-domain-edit
         padding: 10px
@@ -163,6 +188,7 @@ onBeforeMount(() => {
     margin: 10px auto
     max-width: 800px
     color: #fff
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, 0 3px black
 
     h1
         margin: 4px
@@ -249,10 +275,13 @@ onBeforeMount(() => {
                 grid-template-columns: 60% 40%
                 align-items: start
 
-                h2
+                .theme-title
                     margin: 0
                     overflow: hidden
                     text-overflow: ellipsis
+                    font-family: 'DharmaGothicE-ExBold', sans-serif
+                    font-size: 3rem
+                    line-height: 0.9
                     display: -webkit-box
                     -webkit-line-clamp: 2
                     -webkit-box-orient: vertical

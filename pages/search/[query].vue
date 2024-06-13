@@ -1,79 +1,109 @@
 <template>
-  <div class="container">
-    <div class="row mt-3" v-if="searchResults.length > 0">
-      <div class="col-12">
-        <h2 class="search-title">Search Results for {{ searchTerm }}</h2>
-      </div>
-      <div class="col-12 search-item-amount">
-        <label for="perPage">Items per page: </label>
-        <select id="perPage" v-model="perPage">
-          <option value="10">10</option>
-          <option value="20">20</option>
-          <option value="50">50</option>
-        </select>
-      </div>
-      <div class="col-12">
-        <div class="row">
-          <div class="col-4" v-for="result in searchResults" :key="result.id">
-            <div class="card mb-3">
-              <div class="card-img">
-                <img
-                  :src="result.coverImage.large"
-                  class="card-img-top"
-                  alt="..."
-                  @click="navigateTo(`/anime/${result.idMal}`)"
-                />
-              </div>
-              <div class="card-body">
-                <h3 class="card-title">
-                  <nuxt-link
-                    :to="`/anime/${result.idMal}`"
-                    target=""
-                    rel="noopener noreferrer"
-                    >{{ result.title.english }}</nuxt-link
-                  >
-                </h3>
-                <div class="card-info">
-                  <span class="card-type">{{ result.type }}</span>
-                  <span class="card-episodes" v-if="result.episodes">
-                    | {{ result.episodes }} Episodes</span
-                  >
-                </div>
-                <p
-                  class="card-text"
-                  v-html="sanitizeHTML(result.description)"
-                ></p>
-              </div>
-            </div>
+  <div
+    class="container"
+    v-if="searchResults.length > 0 && searchResults[0] !== 0"
+  >
+    <div class="search-title">
+      <span class="search-title-tag">Search Results for</span><br />
+      <span class="search-title-name">{{ searchTerm }}</span>
+    </div>
+    <div class="search-item-amount">
+      <label for="perPage">Items per page: </label>
+      <select id="perPage" v-model="perPage">
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="50">50</option>
+      </select>
+    </div>
+    <div class="card-results">
+      <div class="card" v-for="result in searchResults" :key="result.id">
+        <div class="card-img">
+          <img
+            v-if="result.type === 'ANIME'"
+            :src="result.coverImage.large"
+            class="card-img-top"
+            alt="..."
+            @click="navigateTo(`/anime/${result.idMal}`)"
+          />
+          <img
+            v-else-if="result.type === 'MANGA'"
+            :src="result.coverImage.large"
+            class="card-img-top"
+            alt="..."
+            @click="navigateTo(`/manga/${result.idMal}`)"
+          />
+        </div>
+        <div class="card-body">
+          <p class="card-title">
+            <nuxt-link
+              v-if="result.type === 'ANIME'"
+              :to="`/anime/${result.idMal}`"
+              target=""
+              rel="noopener noreferrer"
+              >{{ result.title.english }}</nuxt-link
+            >
+            <nuxt-link
+              v-else-if="result.type === 'MANGA'"
+              :to="`/manga/${result.idMal}`"
+              target=""
+              rel="noopener noreferrer"
+              >{{
+                result.title.english
+                  ? result.title.english
+                  : result.title.romaji
+                  ? result.title.romaji
+                  : result.title.native
+                  ? result.title.native
+                  : ""
+              }}</nuxt-link
+            >
+          </p>
+          <div class="card-info">
+            <span class="card-type">{{ result.type }}</span>
+            <span class="card-episodes" v-if="result.episodes">
+              | {{ result.episodes }}
+              {{ result.episodes > 1 ? "Episodes" : "Episode" }}</span
+            >
+            <span class="card-episodes" v-else-if="result.volumes">
+              | {{ result.volumes }}
+              {{ result.volumes > 1 ? "Volumes" : "Volume" }}</span
+            >
           </div>
+          <p class="card-text" v-html="sanitizeHTML(result.description)"></p>
         </div>
       </div>
-      <div class="search-pagination">
-        <button
-          class="search-pagination-button"
-          @click="prevPage"
-          :disabled="currentPage <= 1"
-        >
-          Previous
-        </button>
-        <button
-          class="search-pagination-button"
-          @click="nextPage"
-          :disabled="currentPage >= totalPages"
-        >
-          Next
-        </button>
-      </div>
+    </div>
+    <div class="search-pagination">
+      <button
+        class="search-pagination-button"
+        @click="prevPage"
+        :disabled="currentPage <= 1"
+      >
+        Previous
+      </button>
+      <button
+        class="search-pagination-button"
+        @click="nextPage"
+        :disabled="currentPage >= totalPages"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+  <div class="container" v-else-if="searchResults.length === 0">
+    <div class="search-title">
+      <span class="search-title-tag">No Results found for</span><br />
+      <span class="search-title-name">{{ searchTerm }}</span>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import "~/assets/search.sass";
+import "~/assets/style/search.sass";
 
 import DOMPurify from "dompurify";
 
-const searchResults = ref([]);
+const searchResults = ref([0]);
 const currentPage = ref(1);
 const totalPages = ref(0);
 const perPage = ref(10);
@@ -143,6 +173,7 @@ async function searchAniList(
         }
         description
         episodes
+        volumes
         type
       }
     }
@@ -220,6 +251,39 @@ async function aniListToMal(anilistId: number, type: "anime" | "manga") {
 }
 
 function sanitizeHTML(rawHTML: string) {
-  return DOMPurify.sanitize(rawHTML);
+  if (!rawHTML) return "";
+
+  // Step 1: Extract and store HTML tags
+  const tagMatches = [...rawHTML.matchAll(/<[^>]+>/gm)];
+  const tags = tagMatches.map((match) => ({
+    tag: match[0],
+    index: match.index,
+  }));
+
+  // Step 2: Remove HTML tags for length check
+  const textOnly = rawHTML.replace(/<[^>]+>/gm, "");
+
+  // Step 3: Truncate text content if necessary
+  const truncatedText =
+    textOnly.length > 512
+      ? textOnly.substring(0, 512) + "<br><b>...</b>"
+      : textOnly;
+
+  // Step 4: Reinsert HTML tags into the truncated text
+  let finalText = truncatedText;
+  tags.forEach((tag) => {
+    if (tag.index < 512) {
+      // Only reinsert tags that were in the first 512 characters
+      const insertionPoint =
+        tag.index <= finalText.length ? tag.index : finalText.length;
+      finalText =
+        finalText.slice(0, insertionPoint) +
+        tag.tag +
+        finalText.slice(insertionPoint);
+    }
+  });
+
+  // Step 5: Sanitize and return
+  return DOMPurify.sanitize(finalText);
 }
 </script>

@@ -1,10 +1,10 @@
 <template>
   <footer class="footer">
     <div class="theme-selector">
-      <select v-model="theme" @change="saveTheme">
+      <select v-model="themeIndex" @change="saveTheme">
         <option
           v-for="(themeInfo, index) in themes"
-          :value="index"
+          :value="themeInfo.id"
           :key="index"
         >
           {{ themeInfo.name }}
@@ -25,16 +25,33 @@ interface ThemeInfo {
   name?: string;
   series?: string;
   description?: string;
+  logo?: string;
+  viginette?: string;
   nsfw?: boolean;
 }
 
 const themes = inject("themes") as Ref<Record<number, ThemeInfo>>;
 
-const theme = inject("selectedTheme") as Ref<string>;
+const selectedTheme = inject("selectedTheme") as Ref<ThemeInfo>;
+
+const themeIndex = ref<String>();
+
+watch(selectedTheme, (newVal, oldVal) => {
+  themeIndex.value = newVal.id;
+});
 
 const saveTheme = () => {
-  localStorage.setItem("theme", theme.value);
+  for (const theme in themes.value) {
+    if (themes.value[theme].id === themeIndex.value) {
+      selectedTheme.value = themes.value[theme];
+    }
+  }
+  localStorage.setItem("theme", selectedTheme.value.id);
 };
+
+onMounted(() => {
+  themeIndex.value = localStorage.getItem("theme") || "default";
+});
 </script>
 
 <style lang="sass">

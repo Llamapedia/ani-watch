@@ -1,14 +1,22 @@
 <template>
-  <div v-if="!user" class="index-content">
-    <h1 class="index-welcome">Welcome on AN.AL.eu.org</h1>
+  <div v-if="!user && showContent" class="index-content">
+    <div class="index-welcome">
+      <span class="index-welcome-welcome">Welcome on</span><br />
+      <span class="index-welcome-riju">riju.anal-slavery.com</span>
+    </div>
     <h2 class="index-login-notification">
-      To use AN.AL.eu.org in any capacity you must sign in using your anilist.co
-      account.
+      To use riju.anal-slavery.com in any capacity you must sign in using your
+      anilist.co account.
     </h2>
-    <nuxt-link to="/login">Go to login page.</nuxt-link>
+    <nuxt-link to="/login" class="index-login-redirect"
+      >Go to login page.</nuxt-link
+    >
   </div>
-  <div v-else class="index-content">
-    <h1 class="index-welcome">Welcome back, {{ user.name }}.</h1>
+  <div v-else-if="showContent" class="index-content">
+    <div class="index-welcome">
+      <span class="index-welcome-welcome">Welcome back,</span><br />
+      <span class="index-welcome-riju">{{ user.name }}.</span>
+    </div>
     <div v-if="lists">
       <div class="user-list-selector">
         <h2>Select a list to view:</h2>
@@ -50,9 +58,10 @@
           <nuxt-link :to="`/anime/${entry.media.idMal}`">
             <div class="user-list-entry-cover">
               <img
-                :src="entry.media.coverImage.large"
+                :data-src="entry.media.coverImage.large"
                 alt="Cover Image"
                 class="user-list-entry-cover-image"
+                v-lazy-load
               />
             </div>
 
@@ -80,10 +89,14 @@ import Cookies from "js-cookie";
 const user = ref();
 const lists = ref();
 
-const compactView = ref(false);
+const compactView = ref<Boolean>(false);
+const showContent = ref<Boolean>(false);
 
 onMounted(() => {
   compactView.value = window.innerWidth < 600;
+  setTimeout(() => {
+    showContent.value = true;
+  }, 1000);
   getAnimeData();
 });
 
@@ -215,13 +228,50 @@ const scrollToTop = () => {
 
 .index-welcome
     font-size: 4em
-    line-height: 1.1
+    line-height: 0.9
     margin: 30px 0
-    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, 0 0 10px black
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, 0 5px black
     user-select: none
 
     @media screen and (max-width: 800px)
         font-size: 3em
+
+    .index-welcome-welcome
+        margin: 0
+        font-family: 'DharmaGothicC-HeavyItalic', sans-serif
+        font-size: 4rem
+
+    .index-welcome-riju
+        margin: 0
+        font-family: 'DharmaGothicC-Heavy', sans-serif
+        font-size: 8rem
+
+.index-login-notification
+    font-family: 'DharmaGothicC-Regular', sans-serif
+    font-size: 3em
+    margin: 10px 0
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, 0 5px black
+
+.index-login-redirect
+    position: absolute
+    top: 40%
+    left: 50%
+    transform: translate(-50%, -50%)
+    display: flex
+    justify-content: center
+    align-items: center
+    font-size: 1.5em
+    padding: 5px 10px
+    border-radius: 10px
+    background: #0008
+    color: #fff
+    border: 3px solid #fff
+    cursor: pointer
+    transition: background 0.3s ease-in-out
+
+    &:hover
+        background: #fff
+        color: #000
 
 .user-list-selector
     margin: 10px 0
@@ -294,12 +344,12 @@ const scrollToTop = () => {
 
     .user-list-title
         grid-column: 1 / -1
-        margin: 0
-        font-size: 2em
-        background: #0008
+        margin: 10px 3px 0 3px
+        font-family: 'DharmaGothicE-ExBold', sans-serif
+        font-size: 3rem
+        text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, 0 5px black
         width: fit-content
-        padding: 0 5px
-        border-radius: 10px
+        user-select: none
 
     .user-list-entry
         grid-column: span 1
@@ -314,6 +364,7 @@ const scrollToTop = () => {
         .user-list-entry-cover
             width: 100%
             height: 100%
+            min-height: 200px
             background: #0008
             display: flex
             justify-content: center
@@ -336,7 +387,7 @@ const scrollToTop = () => {
             opacity: 0
             background: linear-gradient(transparent, #000 80%)
             border-radius: 0 0 10px 10px
-            padding: 5px
+            padding: 5px 10px
             box-sizing: border-box
             width: 100%
             transition: opacity 0.3s ease-in-out

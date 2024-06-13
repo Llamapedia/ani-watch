@@ -7,7 +7,17 @@
         class="anime-banner-image"
       />
     </div>
-    <h1 class="anime-title">{{ anime.title.english }}</h1>
+    <h1 class="anime-title">
+      {{
+        anime.title.english
+          ? anime.title.english
+          : anime.title.romaji
+          ? anime.title.romaji
+          : anime.title.native
+          ? anime.title.native
+          : ""
+      }}
+    </h1>
     <div class="anime-info">
       <div class="anime-cover">
         <img
@@ -37,7 +47,7 @@
       <option value="REPEATING">Rewatching</option>
     </select>
     <h2 class="anime-progress">
-      You have watched
+      <span> You have watched</span>
       <div class="anime-progress-modifier">
         <input
           type="number"
@@ -55,7 +65,7 @@
           </button>
         </div>
       </div>
-      out of {{ anime.episodes }} Episodes.
+      <span>out of {{ anime.episodes }} Episodes.</span>
     </h2>
     <button
       class="anime-completion-save"
@@ -81,7 +91,7 @@
       :key="serviceName"
       class="streaming-service"
     >
-      <h2>{{ serviceName }}</h2>
+      <h2 class="streaming-service-title">{{ serviceName }}</h2>
       <div v-for="(link, index) in Object.values(serviceData)" :key="index">
         <a :href="link.url" target="_blank">
           {{ link.title }}
@@ -402,10 +412,10 @@ const decreaseProgress = () => {
         margin: 10px auto
         max-width: 1000px
         color: #fff
-        font: 3em 'Kanit', sans-serif
-        font-size: 200%
-        font-weight: 600
-        text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, 0 0 10px black
+        font: 6rem 'DharmaGothicC-Heavy', sans-serif
+        //font-size: 200%
+        //font-weight: 600
+        text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, 0 5px black
         text-align: center
 
     .anime-info
@@ -414,34 +424,36 @@ const decreaseProgress = () => {
         border-radius: 20px
         padding: 20px
         max-width: 800px
-        display: flex
-        flex-direction: row
+        display: grid
+        grid-template-columns: 1fr 1fr
+        align-items: start
 
         @media screen and (max-width: 800px)
-            flex-direction: column
-            align-items: center
+            grid-template-columns: 1fr
 
         .anime-cover
-            width: 300%
             float: left
             margin-right: 20px
-
-            @media screen and (max-width: 800px)
-                width: 80%
-                margin-right: 0
 
 
             .anime-cover-image
                 border-radius: 20px
                 width: 100%
 
-        .anime-description
-            color: #fff
-            margin-bottom: 10px
+        .anime-text
+            align-self: start
 
-        .anime-episodes
-            color: #fff
-            margin-bottom: 10px
+            .anime-description
+                color: #fff
+                text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black
+                margin-bottom: 10px
+
+            .anime-episodes
+                color: #fff
+                font: 3rem 'DharmaGothicE-ExBold', sans-serif
+                text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, 0 3px black
+                margin: 0
+                margin-bottom: 10px
 
 .streaming-links
     position: relative
@@ -453,15 +465,26 @@ const decreaseProgress = () => {
     color: #fff
     display: grid
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr))
+    gap: 10px
 
     .streaming-links-headline
         grid-column: 1 / -1
+        font: 4rem 'DharmaGothicC-HeavyItalic', sans-serif
+        text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, 0 3px black
         text-align: center
+        margin: 0
         margin-bottom: 20px
+
+    .streaming-service-title
+        font: 2rem 'DharmaGothicE-ExBold', sans-serif
+        text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, 0 3px black
+        margin: 0
+        margin-bottom: 10px
 
     a
         color: #fff
         text-decoration: underline
+
 .anime-completion
     margin: 10px auto
     background: #0008
@@ -493,6 +516,11 @@ const decreaseProgress = () => {
     .anime-progress
         color: #fff
 
+        span
+            font: 2rem 'DharmaGothicE-ExBold'
+            text-align: center
+            text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, 0 3px black
+
         .anime-progress-modifier
             display: flex
             justify-content: center
@@ -501,7 +529,9 @@ const decreaseProgress = () => {
                 appearance: textfield
                 text-align: center
                 width: 50px
-                font: inherit
+                font-size: 2rem
+                font-family: 'DharmaGothicE-ExBold', sans-serif
+                text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, 0 3px black
                 border: 3px solid #fff
                 border-radius: 10px
                 background: #0008
@@ -511,6 +541,13 @@ const decreaseProgress = () => {
                 &:hover
                     background: #fff
                     color: #000
+                    text-shadow: none
+
+            input[type='number']
+                -moz-appearance:textfield
+
+            input::-webkit-outer-spin-button, input::-webkit-inner-spin-button
+                -webkit-appearance: none
 
             .anime-progress-btn-container
                 display: inline-block

@@ -2,7 +2,7 @@
   <nav class="navbar">
     <div class="navbar-elements">
       <nuxt-link to="/" class="logo">
-        <img alt="Logo" class="logo" />
+        <img :src="determineLogo()" class="logo" />
       </nuxt-link>
       <div class="right-side">
         <input
@@ -48,6 +48,18 @@
 <script lang="ts" setup>
 import Cookies from "js-cookie";
 
+interface ThemeInfo {
+  id?: string;
+  name?: string;
+  series?: string;
+  description?: string;
+  logo?: string;
+  viginette?: string;
+  nsfw?: boolean;
+}
+
+const themes = inject("themes") as Ref<Record<number, ThemeInfo>>;
+
 const usericon = ref();
 
 const userdata = ref({});
@@ -58,16 +70,8 @@ const dropdown = ref(false);
 
 const router = useRouter();
 
-const themeFileName = inject("themeFileName");
-
-useHead(() => ({
-  link: [
-    {
-      rel: "stylesheet",
-      href: `/themes/${themeFileName}.css`,
-    },
-  ],
-}));
+const themeDomain = inject("themeDomain") as Ref<string>;
+const selectedTheme = inject("selectedTheme") as Ref<ThemeInfo>;
 
 onMounted(() => {
   getUserData();
@@ -119,6 +123,20 @@ const deleteAccessTokenCookie = () => {
   Cookies.remove("access_token");
   window.location.reload();
 };
+
+const determineLogo = () => {
+  if (selectedTheme.value.id === "default" || !themes) {
+    return "/res/logo/default.png";
+  } else {
+    for (const theme of Object.values(themes.value)) {
+      if (theme.id === selectedTheme.value.id) {
+        if (theme.logo)
+          return `${themeDomain.value}/res/logo/${theme.logo}.png`;
+        else return "/res/logo/default.png";
+      }
+    }
+  }
+};
 </script>
 
 <style lang="sass">
@@ -149,6 +167,7 @@ const deleteAccessTokenCookie = () => {
       align-items: center
 
       .search-bar
+        color: #555
         margin-right: 10px
         border-radius: 15px
         outline: none

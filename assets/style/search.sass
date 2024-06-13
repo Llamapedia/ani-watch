@@ -1,0 +1,125 @@
+*
+    color: #fff
+    -webkit-font-smoothing: antialiased
+    -moz-osx-font-smoothing: grayscale
+    
+.container
+    margin: 0 auto
+    max-width: 800px
+
+    .search-title
+        font-size: 4em
+        line-height: 0.9
+        margin: 30px 0
+        text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, 0 5px black
+        user-select: none
+
+        .search-title-tag
+            margin: 0
+            font-family: 'DharmaGothicC-HeavyItalic', sans-serif
+            font-size: 3rem
+
+        .search-title-name
+            margin: 0
+            font-family: 'DharmaGothicC-Heavy', sans-serif
+            font-size: 6rem
+
+        
+
+    .search-item-amount
+        font-size: 1.5em
+        color: #fff
+        background: #0008
+        margin-bottom: 20px
+        padding: 2px 5px
+        border-radius: 5px
+        width: fit-content
+
+        select
+            border: 3px solid #fff
+            border-radius: 10px
+            width: fit-content
+            font: inherit
+            background: #0008
+            color: #fff
+            padding: 5px 10px
+            cursor: pointer
+            transition: background 0.3s ease-in-out
+
+            &:hover
+                background: #fff
+                color: #000
+
+    .card
+        color: #fff
+        background: #0008
+        margin: 10px auto
+        width: 100%
+        padding: 10px
+        border-radius: 20px
+        display: grid
+        grid-template-columns: 1fr 2fr
+        box-sizing: border-box
+
+        @media screen and (max-width: 768px)
+            grid-template-columns: 1fr
+
+        .card-img
+            box-sizing: border-box
+
+            .card-img-top
+                border-radius: 20px
+                width: 100%
+                cursor: pointer
+
+            @media screen and (max-width: 768px)
+                margin: 0 auto
+                max-width: 100%
+                margin-bottom: 20px
+
+        .card-body
+            padding: 0 20px
+            box-sizing: border-box
+            text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, 0 3px black
+
+            @media screen and (max-width: 768px)
+                margin: 0 auto
+                max-width: 100%
+
+            .card-title
+                a
+                    color: #fff
+                    font-family: 'DharmaGothicE-ExBold', sans-serif
+                    font-size: 3rem
+
+            .card-info
+                font-family: 'DharmaGothicE-ExBold', sans-serif
+                font-size: 1.5rem
+
+            .card-text
+                @media screen and (max-width: 768px)
+                    display: none
+
+    .search-pagination
+        display: flex
+        justify-content: center
+        gap: 10px
+        margin: 20px 0
+
+        button
+            border: 3px solid #fff
+            border-radius: 10px
+            font: inherit
+            background: #0008
+            color: #fff
+            padding: 5px 10px
+            cursor: pointer
+            transition: background 0.3s ease-in-out
+
+            &:hover
+                background: #fff
+                color: #000
+
+            &:disabled
+                filter: brightness(0)
+                cursor: not-allowed

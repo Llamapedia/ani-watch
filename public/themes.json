@@ -4,6 +4,15 @@
         "name": "Default theme",
         "series": "",
         "description": "The default theme.",
+        "viginette": "none",
         "nsfw": false
+    },
+    {
+        "id": "riju",
+        "name": "Riju",
+        "series": "The Legend of Zelda: Breath of the Wild",
+        "description": "A theme based on Riju from The Legend of Zelda: Breath of the Wild, our mascot.",
+        "logo": "riju",
+        "nsfw": true
     }
 ]
