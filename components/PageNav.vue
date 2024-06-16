@@ -26,10 +26,10 @@
             height="32"
           />
           <div v-if="signedIn && dropdown" class="dropdown">
-            <a href="#" class="dropdown-content">
+            <nuxt-link to="/profile" class="dropdown-content">
               <img src="~/assets/svg/user.svg" alt="" />
               Profile
-            </a>
+            </nuxt-link>
             <a href="#" class="dropdown-content">
               <img src="~/assets/svg/settings.svg" alt="" />
               Settings
@@ -193,6 +193,7 @@ const determineLogo = () => {
           min-width: 160px
           box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2)
           border-radius: 20px
+          z-index: 3
 
           .dropdown-content
             color: #000
@@ -212,7 +213,6 @@ const determineLogo = () => {
             &:last-child
               border-radius: 0 0 20px 20px
 
-            &:nth-child(1),
             &:nth-child(2)
               color: #ccc
               cursor: default

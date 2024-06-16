@@ -405,6 +405,7 @@ const decreaseProgress = () => {
             left: 0
             width: 100%
             border-radius: 20px
+            z-index: -1
 
     .manga-title
         margin: 10px auto
