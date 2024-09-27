@@ -5,10 +5,7 @@
   >
     <div class="page-bg" ref="pageBg" :style="brightnessStyle">
       <div class="page-bg-img" v-for="i in 9" :key="i">
-        <img
-          :src="`${themeDomain}/res/background/${selectedTheme?.id}.png`"
-          alt="Background"
-        />
+        <img alt="Background" />
       </div>
     </div>
     <PageNav />
@@ -49,6 +46,13 @@ watch(themeDomain, (newVal, oldVal) => {
 watch(themes, (newVal, oldVal) => {
   if (newVal !== oldVal) {
     selectedTheme.value.id = localStorage.getItem("theme") || "default";
+    applyActiveBackgroundImage();
+  }
+});
+
+watch(selectedTheme, (newVal, oldVal) => {
+  if (newVal !== oldVal) {
+    applyActiveBackgroundImage();
   }
 });
 
@@ -122,6 +126,56 @@ const fetchThemes = async () => {
     .then((res) => res.json())
     .then((data) => (themes.value = data))
     .catch((error) => console.error(error)); // Add a catch block to handle any errors
+};
+
+const applyActiveBackgroundImage = async () => {
+  try {
+    const imageUrl = `${themeDomain.value}/res/background/${selectedTheme.value.id}.png`;
+
+    const cache = await caches.open("riju-cache-v1");
+    const cachedResponse = await cache.match(imageUrl);
+
+    if (cachedResponse) {
+      console.log("Image retrieved from cache:", imageUrl);
+
+      const blob = URL.createObjectURL(await cachedResponse.blob());
+
+      const imageElements = pageBg.value?.querySelectorAll("img");
+      if (imageElements) {
+        imageElements.forEach(async (element) => {
+          element.src = blob;
+        });
+      }
+    } else {
+      console.log("No cached image found, fetching from network...");
+      console.log("Image URL:", imageUrl);
+      const response = await fetch(imageUrl);
+      if (response.ok) {
+        const newCache = await caches.open("riju-cache-v1");
+        const cachedRequests = await newCache.keys();
+
+        for (const request of cachedRequests) {
+          await newCache.delete(request);
+        }
+
+        newCache.put(imageUrl, response.clone());
+        console.log("Image fetched from network and cached.");
+
+        const blob = URL.createObjectURL(await response.blob());
+
+        const imageElements = pageBg.value?.querySelectorAll("img");
+        if (imageElements) {
+          imageElements.forEach(async (element) => {
+            element.src = blob;
+          });
+        }
+      } else {
+        console.error("Failed to fetch image:", response.status);
+      }
+    }
+  } catch (error) {
+    console.error("Error retrieving image from cache:", error);
+  }
 };
 </script>
 

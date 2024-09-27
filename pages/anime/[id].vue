@@ -350,7 +350,7 @@ async function addAnimeToList() {
 }
 
 async function fetchStreamingData(malId: number) {
-  const proxyUrl = "https://nhentai-api.onrender.com/";
+  const proxyUrl = ""; //"https://nhentai-api.onrender.com/";
   const targetUrl = `https://api.malsync.moe/mal/anime/${malId}`;
   const response = await fetch(proxyUrl + targetUrl);
   const data = await response.json();
@@ -392,6 +392,8 @@ const decreaseProgress = () => {
 </script>
 
 <style lang="sass" scoped>
+$blur-radius: 1px
+
 .anime-details
     position: relative
 
@@ -407,6 +409,7 @@ const decreaseProgress = () => {
             left: 0
             width: 100%
             border-radius: 20px
+            border: 3px solid #0008
 
     .anime-title
         margin: 10px auto
@@ -421,6 +424,7 @@ const decreaseProgress = () => {
     .anime-info
         margin: 10px auto
         background: #0008
+        backdrop-filter: blur($blur-radius)
         border-radius: 20px
         padding: 20px
         max-width: 800px
@@ -445,6 +449,7 @@ const decreaseProgress = () => {
 
             .anime-description
                 color: #fff
+                line-height: 1.2
                 text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black
                 margin-bottom: 10px
 
@@ -459,6 +464,7 @@ const decreaseProgress = () => {
     position: relative
     margin: 10px auto
     background: #0008
+    backdrop-filter: blur($blur-radius)
     border-radius: 20px
     padding: 20px
     max-width: 800px
@@ -488,6 +494,7 @@ const decreaseProgress = () => {
 .anime-completion
     margin: 10px auto
     background: #0008
+    backdrop-filter: blur($blur-radius)
     border-radius: 20px
     padding: 20px
     max-width: 800px

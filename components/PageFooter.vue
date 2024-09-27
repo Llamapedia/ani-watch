@@ -36,6 +36,8 @@ const selectedTheme = inject("selectedTheme") as Ref<ThemeInfo>;
 
 const themeIndex = ref<String>();
 
+const themeDomain = inject("themeDomain") as Ref<string>;
+
 watch(selectedTheme, (newVal, oldVal) => {
   themeIndex.value = newVal.id;
 });
@@ -47,6 +49,29 @@ const saveTheme = () => {
     }
   }
   localStorage.setItem("theme", selectedTheme.value.id);
+
+  const imageUrl = `${themeDomain.value}/res/background/${selectedTheme.value.id}.png`;
+  fetch(imageUrl)
+    .then(async (response) => {
+      if (response.ok) {
+        try {
+          const cache = await caches.open("riju-cache-v1");
+          const cachedRequests = await cache.keys();
+
+          for (const request of cachedRequests) {
+            await cache.delete(request);
+          }
+
+          await cache.put(imageUrl, response);
+          console.log("New image cached successfully");
+        } catch (error) {
+          console.error("Error caching image:", error);
+        }
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching theme image", error);
+    });
 };
 
 onMounted(() => {

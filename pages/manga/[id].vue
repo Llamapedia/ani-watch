@@ -348,7 +348,7 @@ async function addMangaToList() {
 }
 
 async function fetchStreamingData(malId: number) {
-  const proxyUrl = "https://nhentai-api.onrender.com/";
+  const proxyUrl = ""; //"https://nhentai-api.onrender.com/";
   const targetUrl = `https://api.malsync.moe/mal/manga/${malId}`;
   const response = await fetch(proxyUrl + targetUrl);
   const data = await response.json();
@@ -443,6 +443,7 @@ const decreaseProgress = () => {
 
             .manga-description
                 color: #fff
+                line-height: 1.2
                 text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black
                 margin-bottom: 10px
 
